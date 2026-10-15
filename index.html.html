@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>RAW BEAST CALISTHENICS TRACKER</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Anton, Montserrat & Oswald -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;700;900&family=Oswald:wght@500;700;900&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            beast: {
+              black: '#08080a',
+              dark: '#111116',
+              card: '#181820',
+              border: '#2e2e3a',
+              orange: '#ff3e00',
+              amber: '#ff8c00',
+              gold: '#ffd700',
+              neon: '#ff1e00',
+            }
+          },
+          fontFamily: {
+            impact: ['Anton', 'Oswald', 'sans-serif'],
+            sans: ['Montserrat', 'sans-serif'],
+            mono: ['Courier New', 'monospace']
+          },
+          boxShadow: {
+            'glow-orange': '0 0 20px rgba(255, 62, 0, 0.4)',
+            'glow-gold': '0 0 20px rgba(255, 215, 0, 0.3)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #08080a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #ff3e00;
+      border-radius: 3px;
+    }
+
+    body {
+      background-color: #08080a;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(255, 62, 0, 0.12) 0%, transparent 70%),
+        linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 24px;
+      color: #e2e8f0;
+      font-family: 'Montserrat', sans-serif;
+      touch-action: manipulation;
+    }
+
+    .beast-card {
+      background: linear-gradient(145deg, #16161e, #101014);
+      border: 1px solid #282834;
+      position: relative;
+    }
+
+    .beast-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,62,0,0.5), transparent);
+    }
+
+    .btn-beast {
+      background: linear-gradient(135deg, #ff3e00, #b32400);
+      text-transform: uppercase;
+      font-family: 'Anton', sans-serif;
+      letter-spacing: 1px;
+      clip-path: polygon(0 0, 100% 0, 96% 100%, 0% 100%);
+      transition: all 0.15s ease-in-out;
+    }
+
+    .btn-beast:active {
+      transform: scale(0.97);
+      filter: brightness(1.2);
+    }
+
+    /* Category Badges Styling */
+    .badge-back { background: #1e3a8a; color: #93c5fd; border: 1px solid #3b82f6; }
+    .badge-chest { background: #831843; color: #fbcfe8; border: 1px solid #f43f5e; }
+    .badge-biceps { background: #581c87; color: #e9d5ff; border: 1px solid #a855f7; }
+    .badge-triceps { background: #701a75; color: #f5d0fe; border: 1px solid #d946ef; }
+    .badge-shoulders { background: #713f12; color: #fef08a; border: 1px solid #eab308; }
+    .badge-legs { background: #14532d; color: #bbf7d0; border: 1px solid #22c55e; }
+    .badge-abs { background: #7c2d12; color: #fed7aa; border: 1px solid #f97316; }
+    .badge-cardio { background: #134e4a; color: #99f6e4; border: 1px solid #14b8a6; }
+
+    /* Pulsing timer indicator */
+    .timer-active {
+      animation: timerPulse 1s infinite alternate;
+    }
+    @keyframes timerPulse {
+      0% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.2); }
+      100% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.8); }
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-10 select-none overflow-x-hidden">
+
+  <!-- TOP HEADER -->
+  <header class="sticky top-0 z-40 bg-beast-black/90 backdrop-blur-md border-b border-beast-border px-4 py-3">
+    <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-beast-orange flex items-center justify-center font-impact text-2xl text-black rotate-[-2deg] shadow-glow-orange">
+          RAW
+        </div>
+        <div>
+          <h1 class="font-impact text-2xl tracking-wider text-white uppercase leading-none">
+            ROOM <span class="text-beast-orange">ISOLATION</span>
+          </h1>
+          <p class="text-[10px] text-gray-400 font-mono tracking-widest uppercase">WILD CALISTHENICS TRACKER</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-2 bg-beast-dark px-3 py-1.5 rounded border border-beast-border">
+        <i data-lucide="flame" class="w-5 h-5 text-beast-orange animate-pulse"></i>
+        <div class="text-right">
+          <div id="headerStreak" class="font-impact text-lg text-beast-gold leading-none">0 DAYS</div>
+          <div class="text-[9px] text-gray-500 font-bold uppercase">WORKOUT DAYS</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-4xl mx-auto px-3 sm:px-4 pt-4 space-y-4">
+
+    <!-- BOLD SINGLE ACTION BUTTON -->
+    <button id="todayWorkoutBtn" class="btn-beast w-full py-4 text-black font-impact text-2xl sm:text-3xl tracking-wider shadow-glow-orange flex items-center justify-center space-x-3">
+      <i data-lucide="dumbbell" class="w-8 h-8"></i>
+      <span>TODAY'S WORKOUT (오늘의 운동)</span>
+    </button>
+
+    <!-- CALENDAR SECTION -->
+    <section class="beast-card p-4 rounded-xl shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="calendar-days" class="w-6 h-6 text-beast-orange"></i>
+          <h2 id="calendarMonthYear" class="font-impact text-2xl tracking-wider text-white uppercase">
+            OCTOBER 2026
+          </h2>
+        </div>
+        <div class="flex items-center space-x-1">
+          <button id="prevMonthBtn" class="p-2 bg-beast-dark border border-beast-border hover:border-beast-orange rounded text-gray-300">
+            <i data-lucide="chevron-left" class="w-5 h-5"></i>
+          </button>
+          <button id="todayBtn" class="px-3 py-1.5 bg-beast-dark border border-beast-border hover:border-beast-orange rounded text-xs font-bold uppercase text-beast-orange">
+            TODAY
+          </button>
+          <button id="nextMonthBtn" class="p-2 bg-beast-dark border border-beast-border hover:border-beast-orange rounded text-gray-300">
+            <i data-lucide="chevron-right" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- CATEGORY BADGES LEGEND -->
+      <div class="flex flex-wrap gap-1.5 mb-4 pb-3 border-b border-beast-border/60 text-[11px] font-bold">
+        <span class="px-2 py-0.5 rounded badge-back">등 (BACK)</span>
+        <span class="px-2 py-0.5 rounded badge-chest">가슴 (CHEST)</span>
+        <span class="px-2 py-0.5 rounded badge-biceps">이두 (BICEPS)</span>
+        <span class="px-2 py-0.5 rounded badge-triceps">삼두 (TRICEPS)</span>
+        <span class="px-2 py-0.5 rounded badge-shoulders">어깨 (SHOULDERS)</span>
+        <span class="px-2 py-0.5 rounded badge-legs">다리 (LEGS)</span>
+        <span class="px-2 py-0.5 rounded badge-abs">복근 (ABS)</span>
+        <span class="px-2 py-0.5 rounded badge-cardio">유산소 (CARDIO)</span>
+      </div>
+
+      <!-- CALENDAR GRID HEADER -->
+      <div class="grid grid-cols-7 gap-1 text-center font-bold text-xs text-gray-500 mb-2">
+        <div class="text-beast-orange">SUN</div>
+        <div>MON</div>
+        <div>TUE</div>
+        <div>WED</div>
+        <div>THU</div>
+        <div>FRI</div>
+        <div class="text-blue-400">SAT</div>
+      </div>
+
+      <!-- CALENDAR GRID DAYS -->
+      <div id="calendarGrid" class="grid grid-cols-7 gap-1.5 sm:gap-2">
+        <!-- JS dynamically renders calendar cells -->
+      </div>
+    </section>
+  </main>
+
+  <!-- WORKOUT ENTRY & VIEW MODAL -->
+  <div id="logModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="beast-card w-full max-w-lg rounded-xl overflow-hidden shadow-2xl border-2 border-beast-border max-h-[92vh] flex flex-col">
+      
+      <!-- MODAL HEADER -->
+      <div class="p-4 bg-beast-dark border-b border-beast-border flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="flame" class="w-6 h-6 text-beast-orange"></i>
+          <h3 id="modalTitle" class="font-impact text-xl text-white uppercase tracking-wider">LOG WORKOUT</h3>
+        </div>
+        <button id="closeModalBtn" class="p-1 text-gray-400 hover:text-white">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <!-- MODAL BODY -->
+      <div class="p-4 space-y-4 overflow-y-auto flex-1">
+        
+        <!-- TARGET DATE -->
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">DATE (날짜)</label>
+          <input type="date" id="modalInputDate" class="w-full bg-beast-black border border-beast-border rounded p-2.5 text-white font-mono focus:border-beast-orange outline-none">
+        </div>
+
+        <!-- LOGGED WORKOUTS LIST FOR SELECTED DATE -->
+        <div id="modalDayLogContainer" class="space-y-2">
+          <label class="block text-xs font-bold text-beast-orange uppercase">RECORDED SETS FOR THIS DATE (이 날의 운동 기록)</label>
+          <div id="modalDayLogList" class="space-y-2 max-h-36 overflow-y-auto pr-1">
+            <!-- Loaded by JS -->
+          </div>
+        </div>
+
+        <!-- TARGET MUSCLE CATEGORY -->
+        <div class="pt-2 border-t border-beast-border">
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">ADD NEW SET - BODY PART (운동 부위)</label>
+          <div class="grid grid-cols-4 gap-1.5" id="categorySelector">
+            <button type="button" data-cat="등" class="cat-btn py-2 text-xs font-bold rounded border border-beast-border bg-beast-black text-gray-300 hover:border-beast-orange">등</button>
+            <button type="button" data-cat="가슴" class="cat-btn py-2 text-xs font-bold rounded border border-beast-border bg-beast-black text-gray-300 hover:border-beast-orange">가슴</button>
+            <button type="button" data-cat="이두" class="cat-btn py-2 text-xs font-bold rounded border border-beast-border bg-beast-black text-gray-300 hover:border-beast-orange">이두</button>
+            <button type="button" data-cat="삼두" class="cat-btn py-2 text-xs font-bold rounded border border-beast-border bg-beast-black text-gray-300 hover:border-beast-orange">삼두</button>
+            <button type="button" data-cat="어깨" class="cat-btn py-2 text-xs font-bold rounded border border-beast-border bg-beast-black text-gray-300 hover:border-beast-orange">어깨</button>
+            <button type="button" data-cat="다리" class="cat-btn py-2 text-xs font-bold rounded border border-beast-border bg-beast-black text-gray-300 hover:border-beast-orange">다리</button>
+            <button type="button" data-cat="복근" class="cat-btn py-2 text-xs font-bold rounded border border-beast-border bg-beast-black text-gray-300 hover:border-beast-orange">복근</button>
+            <button type="button" data-cat="유산소" class="cat-btn py-2 text-xs font-bold rounded border border-beast-border bg-beast-black text-gray-300 hover:border-beast-orange">유산소</button>
+          </div>
+        </div>
+
+        <!-- EXERCISE SELECTION DROPDOWN & CUSTOM EXERCISE ADDITION -->
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="block text-xs font-bold text-gray-400 uppercase">EXERCISE NAME (종목 선택)</label>
+            <span class="text-[10px] text-beast-orange font-bold">*목록에 없으면 바로 추가</span>
+          </div>
+
+          <div class="space-y-2">
+            <!-- EXERCISE SELECT DROPDOWN -->
+            <select id="exerciseSelect" class="w-full bg-beast-black border border-beast-border rounded p-2.5 text-white font-bold focus:border-beast-orange outline-none">
+              <!-- JS Populates this -->
+            </select>
+
+            <!-- CUSTOM EXERCISE INPUT SECTION -->
+            <div class="flex space-x-2 pt-1">
+              <input type="text" id="customExerciseInput" placeholder="새 운동 이름 입력 (예: 머슬업, 레버 hold)" class="flex-1 bg-beast-black border border-beast-border rounded p-2 text-xs text-white focus:border-beast-orange outline-none">
+              <button type="button" id="addCustomExerciseBtn" class="px-3 py-2 bg-beast-dark hover:bg-beast-orange hover:text-black border border-beast-border text-gray-200 font-bold text-xs rounded transition-colors whitespace-nowrap flex items-center space-x-1">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>운동 추가</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- LOG TYPE TOGGLE -->
+        <div class="bg-beast-black p-1 rounded border border-beast-border flex">
+          <button type="button" id="typeRepsBtn" class="flex-1 py-2 text-xs font-bold uppercase rounded bg-beast-orange text-black">
+            WEIGHT & REPS (중량/횟수)
+          </button>
+          <button type="button" id="typeTimeBtn" class="flex-1 py-2 text-xs font-bold uppercase rounded text-gray-400 hover:text-white">
+            ISOMETRIC TIMER (버티기/타이머)
+          </button>
+        </div>
+
+        <!-- FIELD SET 1: WEIGHT & REPS -->
+        <div id="fieldsetReps" class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">ADDED WEIGHT (KG)</label>
+            <input type="number" id="modalInputWeight" value="0" step="0.5" class="w-full bg-beast-black border border-beast-border rounded p-2.5 text-beast-amber font-impact text-xl focus:border-beast-orange outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">REPETITIONS (회)</label>
+            <input type="number" id="modalInputReps" value="10" step="1" class="w-full bg-beast-black border border-beast-border rounded p-2.5 text-white font-impact text-xl focus:border-beast-orange outline-none">
+          </div>
+        </div>
+
+        <!-- FIELD SET 2: ISOMETRIC TIMER & HOLD TIME -->
+        <div id="fieldsetTime" class="hidden space-y-3">
+          
+          <!-- LIVE STOPWATCH/TIMER BOX -->
+          <div id="timerCard" class="bg-beast-black p-4 rounded-lg border border-beast-border space-y-3 text-center relative overflow-hidden">
+            <div class="text-[10px] text-beast-gold uppercase font-mono tracking-widest flex items-center justify-center space-x-1">
+              <i data-lucide="timer" class="w-4 h-4"></i>
+              <span>ISOMETRIC HOLD STOPWATCH</span>
+            </div>
+
+            <!-- DIGITAL TIMER DISPLAY -->
+            <div id="timerDisplay" class="font-impact text-5xl text-beast-gold tracking-widest my-1">
+              00:00
+            </div>
+
+            <!-- CONTROLS -->
+            <div class="flex items-center justify-center space-x-2">
+              <button type="button" id="timerStartBtn" class="px-5 py-2.5 bg-beast-orange text-black font-impact text-base rounded shadow-glow-orange flex items-center space-x-1">
+                <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+                <span>START</span>
+              </button>
+              <button type="button" id="timerPauseBtn" class="px-4 py-2.5 bg-beast-dark text-white font-impact text-base rounded border border-beast-border flex items-center space-x-1">
+                <i data-lucide="pause" class="w-4 h-4"></i>
+                <span>PAUSE</span>
+              </button>
+              <button type="button" id="timerResetBtn" class="px-4 py-2.5 bg-beast-dark text-gray-400 font-impact text-base rounded border border-beast-border">
+                RESET
+              </button>
+            </div>
+
+            <!-- QUICK PRESET BUTTONS -->
+            <div class="flex justify-center space-x-2 pt-1">
+              <button type="button" onclick="setTimerSeconds(30)" class="px-2.5 py-1 bg-beast-card text-xs text-gray-300 font-mono rounded border border-beast-border hover:border-beast-gold">30초</button>
+              <button type="button" onclick="setTimerSeconds(40)" class="px-2.5 py-1 bg-beast-card text-xs text-beast-gold font-bold rounded border border-beast-gold shadow-glow-gold">40초 (할로우바디)</button>
+              <button type="button" onclick="setTimerSeconds(60)" class="px-2.5 py-1 bg-beast-card text-xs text-gray-300 font-mono rounded border border-beast-border hover:border-beast-gold">60초</button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">RECORDED HOLD TIME (초)</label>
+            <input type="number" id="modalInputHoldSeconds" value="40" step="1" class="w-full bg-beast-black border border-beast-border rounded p-2.5 text-beast-gold font-impact text-2xl focus:border-beast-orange outline-none">
+          </div>
+        </div>
+
+        <!-- SETS INPUT -->
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">COMPLETED SETS (세트 수)</label>
+          <div class="flex items-center space-x-2">
+            <button type="button" id="setsMinusBtn" class="p-2.5 bg-beast-black border border-beast-border rounded text-white font-bold hover:border-beast-orange">-</button>
+            <input type="number" id="modalInputSets" value="1" min="1" max="50" class="flex-1 bg-beast-black border border-beast-border rounded p-2.5 text-center font-impact text-xl text-white outline-none">
+            <button type="button" id="setsPlusBtn" class="p-2.5 bg-beast-black border border-beast-border rounded text-white font-bold hover:border-beast-orange">+</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- MODAL FOOTER -->
+      <div class="p-4 bg-beast-dark border-t border-beast-border">
+        <button id="saveLogBtn" class="btn-beast w-full py-3.5 text-black font-bold text-lg tracking-wider shadow-glow-orange flex items-center justify-center space-x-2">
+          <i data-lucide="check-circle" class="w-6 h-6"></i>
+          <span>SAVE WORKOUT (기록 저장)</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // DEFAULT EXERCISE PRESETS PER CATEGORY
+    const DEFAULT_EXERCISES = {
+      '등': ['풀업 (Pull-up)', '친업 (Chin-up)', '중량 풀업', '오스트레일리안 풀업', '프론트 레버 hold', '바벨 로우'],
+      '가슴': ['디클라인 푸시업', '딥스 (Dips)', '중량 딥스', '일반 푸시업', '링 딥스', '다이아몬드 푸시업'],
+      '이두': ['친업 (이두 집중)', '덤벨 컬', '바디웨이트 컬', '해머 컬'],
+      '삼두': ['딥스', '다이아몬드 푸시업', '삼두 벤치 딥스', '라잉 익스텐션'],
+      '어깨': ['파이크 푸시업', '물구나무 서기 (Handstand)', '벽 물구나무 푸시업', '사이드 레터럴 레이즈'],
+      '다리': ['맨몸 스쿼트', '불가리안 스플릿 스쿼트', '피스톨 스쿼트', '런지'],
+      '복근': ['할로우 바디 Hold', 'L-싯 Hold', '행잉 레그레이즈', '플랭크 Hold', '아브휠'],
+      '유산소': ['버피 테스트', '줄줄이 뛰기', '달리기', '스텝퍼']
+    };
+
+    const STORAGE_KEY_LOGS = 'BEAST_CALISTHENICS_LOGS_V2';
+    const STORAGE_KEY_CUSTOM_EX = 'BEAST_CUSTOM_EXERCISES_V2';
+
+    // APP STATE
+    let workoutLogs = [];
+    let customExercises = {};
+    let currentDate = new Date();
+    let selectedDateStr = formatDateStr(new Date());
+    let activeCategory = '등';
+    let logType = 'REPS'; // 'REPS' or 'TIME'
+
+    // STOPWATCH STATE
+    let timerInterval = null;
+    let timerSeconds = 0;
+    let isTimerRunning = false;
+
+    // DOM ELEMENTS
+    const calendarGrid = document.getElementById('calendarGrid');
+    const calendarMonthYear = document.getElementById('calendarMonthYear');
+    const prevMonthBtn = document.getElementById('prevMonthBtn');
+    const nextMonthBtn = document.getElementById('nextMonthBtn');
+    const todayBtn = document.getElementById('todayBtn');
+    const todayWorkoutBtn = document.getElementById('todayWorkoutBtn');
+    
+    const logModal = document.getElementById('logModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const saveLogBtn = document.getElementById('saveLogBtn');
+
+    const modalInputDate = document.getElementById('modalInputDate');
+    const exerciseSelect = document.getElementById('exerciseSelect');
+    const customExerciseInput = document.getElementById('customExerciseInput');
+    const addCustomExerciseBtn = document.getElementById('addCustomExerciseBtn');
+
+    const modalInputWeight = document.getElementById('modalInputWeight');
+    const modalInputReps = document.getElementById('modalInputReps');
+    const modalInputHoldSeconds = document.getElementById('modalInputHoldSeconds');
+    const modalInputSets = document.getElementById('modalInputSets');
+
+    const typeRepsBtn = document.getElementById('typeRepsBtn');
+    const typeTimeBtn = document.getElementById('typeTimeBtn');
+    const fieldsetReps = document.getElementById('fieldsetReps');
+    const fieldsetTime = document.getElementById('fieldsetTime');
+
+    window.onload = function() {
+      lucide.createIcons();
+      loadStoredData();
+      renderCalendar();
+      updateDashboardMetrics();
+      setupCategorySelector();
+
+      // Event Listeners
+      prevMonthBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
+      nextMonthBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
+      todayBtn.addEventListener('click', () => { currentDate = new Date(); selectedDateStr = formatDateStr(new Date()); renderCalendar(); });
+
+      todayWorkoutBtn.addEventListener('click', () => {
+        selectedDateStr = formatDateStr(new Date());
+        openModal(selectedDateStr);
+      });
+
+      closeModalBtn.addEventListener('click', () => closeModal());
+      saveLogBtn.addEventListener('click', saveWorkoutLog);
+
+      addCustomExerciseBtn.addEventListener('click', handleAddCustomExercise);
+
+      typeRepsBtn.addEventListener('click', () => setLogType('REPS'));
+      typeTimeBtn.addEventListener('click', () => setLogType('TIME'));
+
+      document.getElementById('setsMinusBtn').addEventListener('click', () => {
+        let val = parseInt(modalInputSets.value) || 1;
+        if (val > 1) modalInputSets.value = val - 1;
+      });
+      document.getElementById('setsPlusBtn').addEventListener('click', () => {
+        let val = parseInt(modalInputSets.value) || 1;
+        modalInputSets.value = val + 1;
+      });
+
+      // Stopwatch buttons
+      document.getElementById('timerStartBtn').addEventListener('click', startTimer);
+      document.getElementById('timerPauseBtn').addEventListener('click', pauseTimer);
+      document.getElementById('timerResetBtn').addEventListener('click', resetTimer);
+
+      modalInputDate.addEventListener('change', (e) => {
+        if (e.target.value) {
+          selectedDateStr = e.target.value;
+          renderModalDayLogs();
+        }
+      });
+
+      exerciseSelect.addEventListener('change', (e) => {
+        const val = e.target.value;
+        if (val.toLowerCase().includes('hold') || val.includes('할로우') || val.includes('플랭크') || val.toLowerCase().includes('sit')) {
+          setLogType('TIME');
+        }
+      });
+    };
+
+    // LOCAL STORAGE HANDLING
+    function loadStoredData() {
+      const storedLogs = localStorage.getItem(STORAGE_KEY_LOGS);
+      if (storedLogs) {
+        try { workoutLogs = JSON.parse(storedLogs); } catch (e) { workoutLogs = []; }
+      } else {
+        workoutLogs = [
+          { id: '1', date: formatDateStr(new Date()), category: '등', exercise: '풀업 (Pull-up)', type: 'REPS', weight: 0, reps: 10, sets: 4, seconds: 0 },
+          { id: '2', date: formatDateStr(new Date()), category: '복근', exercise: '할로우 바디 Hold', type: 'TIME', weight: 0, reps: 0, sets: 3, seconds: 40 }
+        ];
+        saveLogsToStorage();
+      }
+
+      const storedCustom = localStorage.getItem(STORAGE_KEY_CUSTOM_EX);
+      if (storedCustom) {
+        try { customExercises = JSON.parse(storedCustom); } catch (e) { customExercises = {}; }
+      }
+    }
+
+    function saveLogsToStorage() {
+      localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(workoutLogs));
+    }
+
+    function saveCustomExercisesToStorage() {
+      localStorage.setItem(STORAGE_KEY_CUSTOM_EX, JSON.stringify(customExercises));
+    }
+
+    // DATE HELPERS
+    function formatDateStr(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function getCategoryBadgeClass(cat) {
+      switch(cat) {
+        case '등': return 'badge-back';
+        case '가슴': return 'badge-chest';
+        case '이두': return 'badge-biceps';
+        case '삼두': return 'badge-triceps';
+        case '어깨': return 'badge-shoulders';
+        case '다리': return 'badge-legs';
+        case '복근': return 'badge-abs';
+        case '유산소': return 'badge-cardio';
+        default: return 'bg-gray-800 text-gray-300 border-gray-600';
+      }
+    }
+
+    // RENDER CALENDAR GRID
+    function renderCalendar() {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+
+      const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+      calendarMonthYear.innerText = `${monthNames[month]} ${year}`;
+
+      calendarGrid.innerHTML = '';
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      // Empty padding days
+      for (let i = 0; i < firstDay; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'h-20 sm:h-24 bg-beast-black/40 rounded border border-beast-border/30 opacity-20';
+        calendarGrid.appendChild(emptyCell);
+      }
+
+      const todayStr = formatDateStr(new Date());
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cellDate = new Date(year, month, day);
+        const dateStr = formatDateStr(cellDate);
+        const isSelected = (dateStr === selectedDateStr);
+        const isToday = (dateStr === todayStr);
+
+        const dayLogs = workoutLogs.filter(l => l.date === dateStr);
+        const categoriesLogged = [...new Set(dayLogs.map(l => l.category))];
+
+        const dayCell = document.createElement('div');
+        dayCell.className = `h-20 sm:h-24 p-1 rounded border flex flex-col justify-between cursor-pointer transition-all ${
+          isSelected ? 'border-beast-orange bg-beast-orange/10 shadow-glow-orange' : 
+          isToday ? 'border-beast-gold bg-beast-dark' : 'border-beast-border bg-beast-card hover:border-gray-500'
+        }`;
+
+        dayCell.addEventListener('click', () => {
+          selectedDateStr = dateStr;
+          renderCalendar();
+          openModal(dateStr);
+        });
+
+        // Cell Top Header
+        const topRow = document.createElement('div');
+        topRow.className = 'flex items-center justify-between';
+        topRow.innerHTML = `<span class="font-impact text-sm sm:text-base ${isToday ? 'text-beast-gold' : 'text-gray-300'}">${day}</span>`;
+        if (dayLogs.length > 0) {
+          topRow.innerHTML += `<span class="w-2 h-2 rounded-full bg-beast-orange animate-pulse"></span>`;
+        }
+        dayCell.appendChild(topRow);
+
+        // Cell Badges
+        const badgesContainer = document.createElement('div');
+        badgesContainer.className = 'flex flex-wrap gap-0.5 overflow-hidden max-h-12';
+
+        categoriesLogged.forEach(cat => {
+          const badge = document.createElement('span');
+          badge.className = `text-[8px] sm:text-[9px] px-1 py-0.2 rounded font-bold truncate max-w-full ${getCategoryBadgeClass(cat)}`;
+          badge.innerText = cat;
+          badgesContainer.appendChild(badge);
+        });
+
+        dayCell.appendChild(badgesContainer);
+
+        // Cell Bottom Info
+        const bottomRow = document.createElement('div');
+        bottomRow.className = 'text-[9px] text-gray-500 font-mono text-right';
+        if (dayLogs.length > 0) {
+          bottomRow.innerText = `${dayLogs.length} SETS`;
+        }
+        dayCell.appendChild(bottomRow);
+
+        calendarGrid.appendChild(dayCell);
+      }
+
+      lucide.createIcons();
+    }
+
+    // UPDATE METRICS
+    function updateDashboardMetrics() {
+      const uniqueDays = new Set(workoutLogs.map(log => log.date));
+      const headerStreak = document.getElementById('headerStreak');
+      if (headerStreak) {
+        headerStreak.innerText = `${uniqueDays.size} DAYS`;
+      }
+    }
+
+    // MODAL LOGS DISPLAY FOR SELECTED DATE
+    function renderModalDayLogs() {
+      const dayLogs = workoutLogs.filter(l => l.date === modalInputDate.value);
+      const container = document.getElementById('modalDayLogList');
+      container.innerHTML = '';
+
+      if (dayLogs.length === 0) {
+        container.innerHTML = `<p class="text-xs text-gray-500 italic">기록된 운동이 없습니다.</p>`;
+        return;
+      }
+
+      dayLogs.forEach(log => {
+        const item = document.createElement('div');
+        item.className = 'bg-beast-black p-2 rounded border border-beast-border flex items-center justify-between text-xs';
+        
+        let detailText = '';
+        if (log.type === 'TIME') {
+          detailText = `${log.seconds}초 x ${log.sets}세트`;
+        } else {
+          const weight = log.weight > 0 ? `+${log.weight}kg ` : '';
+          detailText = `${weight}${log.reps}회 x ${log.sets}세트`;
+        }
+
+        item.innerHTML = `
+          <div class="flex items-center space-x-2">
+            <span class="px-1.5 py-0.5 rounded font-bold ${getCategoryBadgeClass(log.category)} text-[10px]">${log.category}</span>
+            <span class="font-bold text-white">${log.exercise}</span>
+            <span class="text-beast-gold font-mono">(${detailText})</span>
+          </div>
+          <button onclick="deleteLog('${log.id}')" class="text-gray-500 hover:text-beast-orange p-1">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        `;
+        container.appendChild(item);
+      });
+
+      lucide.createIcons();
+    }
+
+    // MODAL CONTROLS
+    function openModal(targetDate = selectedDateStr) {
+      modalInputDate.value = targetDate;
+      renderModalDayLogs();
+      logModal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      logModal.classList.add('hidden');
+      resetTimer();
+    }
+
+    function setupCategorySelector() {
+      const catBtns = document.querySelectorAll('.cat-btn');
+      catBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          catBtns.forEach(b => {
+            b.classList.remove('bg-beast-orange', 'text-black', 'border-beast-orange');
+            b.classList.add('bg-beast-black', 'text-gray-300', 'border-beast-border');
+          });
+          btn.classList.remove('bg-beast-black', 'text-gray-300');
+          btn.classList.add('bg-beast-orange', 'text-black', 'border-beast-orange');
+
+          activeCategory = btn.getAttribute('data-cat');
+          populateExerciseDropdown(activeCategory);
+        });
+      });
+      catBtns[0].click(); // Default select Back (등)
+    }
+
+    function populateExerciseDropdown(category) {
+      exerciseSelect.innerHTML = '';
+      const defaults = DEFAULT_EXERCISES[category] || [];
+      const customs = customExercises[category] || [];
+      const combined = [...defaults, ...customs];
+
+      combined.forEach(ex => {
+        const opt = document.createElement('option');
+        opt.value = ex;
+        opt.innerText = ex;
+        exerciseSelect.appendChild(opt);
+      });
+    }
+
+    // ADD CUSTOM EXERCISE
+    function handleAddCustomExercise() {
+      const name = customExerciseInput.value.trim();
+      if (!name) return;
+
+      if (!customExercises[activeCategory]) {
+        customExercises[activeCategory] = [];
+      }
+
+      if (!customExercises[activeCategory].includes(name)) {
+        customExercises[activeCategory].push(name);
+        saveCustomExercisesToStorage();
+        populateExerciseDropdown(activeCategory);
+        exerciseSelect.value = name;
+        customExerciseInput.value = '';
+
+        if (name.toLowerCase().includes('hold') || name.includes('할로우') || name.includes('플랭크')) {
+          setLogType('TIME');
+        }
+      }
+    }
+
+    function setLogType(type) {
+      logType = type;
+      if (type === 'REPS') {
+        typeRepsBtn.className = 'flex-1 py-2 text-xs font-bold uppercase rounded bg-beast-orange text-black';
+        typeTimeBtn.className = 'flex-1 py-2 text-xs font-bold uppercase rounded text-gray-400 hover:text-white';
+        fieldsetReps.classList.remove('hidden');
+        fieldsetTime.classList.add('hidden');
+      } else {
+        typeTimeBtn.className = 'flex-1 py-2 text-xs font-bold uppercase rounded bg-beast-gold text-black';
+        typeRepsBtn.className = 'flex-1 py-2 text-xs font-bold uppercase rounded text-gray-400 hover:text-white';
+        fieldsetTime.classList.remove('hidden');
+        fieldsetReps.classList.add('hidden');
+      }
+    }
+
+    // SAVE LOG ITEM
+    function saveWorkoutLog() {
+      const date = modalInputDate.value;
+      const exercise = exerciseSelect.value || `${activeCategory} 운동`;
+      const sets = parseInt(modalInputSets.value) || 1;
+
+      const newLog = {
+        id: Date.now().toString(),
+        date: date,
+        category: activeCategory,
+        exercise: exercise,
+        type: logType,
+        sets: sets,
+        weight: logType === 'REPS' ? (parseFloat(modalInputWeight.value) || 0) : 0,
+        reps: logType === 'REPS' ? (parseInt(modalInputReps.value) || 0) : 0,
+        seconds: logType === 'TIME' ? (parseInt(modalInputHoldSeconds.value) || 0) : 0
+      };
+
+      workoutLogs.push(newLog);
+      saveLogsToStorage();
+
+      selectedDateStr = date;
+      renderCalendar();
+      renderModalDayLogs();
+      updateDashboardMetrics();
+    }
+
+    function deleteLog(id) {
+      workoutLogs = workoutLogs.filter(l => l.id !== id);
+      saveLogsToStorage();
+      renderCalendar();
+      renderModalDayLogs();
+      updateDashboardMetrics();
+    }
+
+    // TIMER LOGIC
+    function updateTimerDisplay() {
+      const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+      const secs = String(timerSeconds % 60).padStart(2, '0');
+      document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
+    }
+
+    function startTimer() {
+      if (isTimerRunning) return;
+      isTimerRunning = true;
+      document.getElementById('timerCard').classList.add('timer-active');
+      timerInterval = setInterval(() => {
+        timerSeconds++;
+        updateTimerDisplay();
+        modalInputHoldSeconds.value = timerSeconds;
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      isTimerRunning = false;
+      document.getElementById('timerCard').classList.remove('timer-active');
+      clearInterval(timerInterval);
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      timerSeconds = 0;
+      updateTimerDisplay();
+    }
+
+    function setTimerSeconds(secs) {
+      pauseTimer();
+      timerSeconds = secs;
+      updateTimerDisplay();
+      modalInputHoldSeconds.value = secs;
+    }
+  </script>
+</body>
+</html>
